@@ -1,0 +1,28 @@
+{
+  "name": "solcial-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "Solcial - Social Media on Solana Monorepo",
+  "author": "Solcial Team <team@solcial.app>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Arome8240/solcial_app.git"
+  },
+  "scripts": {
+    "backend": "cd apps/backend && pnpm start:dev",
+    "landing": "cd apps/landing && pnpm dev",
+    "backend:install": "cd apps/backend && pnpm install",
+    "landing:install": "cd apps/landing && pnpm install",
+    "install:all": "pnpm backend:install && pnpm landing:install"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}

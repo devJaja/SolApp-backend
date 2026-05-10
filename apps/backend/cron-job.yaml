@@ -1,0 +1,26 @@
+# Render Cron Job Configuration
+# This keeps your free tier service awake by pinging it every 14 minutes
+
+# To set up:
+# 1. Go to Render Dashboard
+# 2. Click "New +" → "Cron Job"
+# 3. Connect your repository
+# 4. Use these settings:
+#    - Name: solcial-keepalive
+#    - Command: curl https://your-app-url.onrender.com/api/health
+#    - Schedule: */14 * * * * (every 14 minutes)
+# 5. Deploy
+
+# Alternative: Use cron-job.org (external service)
+# 1. Go to https://cron-job.org
+# 2. Create free account
+# 3. Create new cron job:
+#    - Title: Solcial Keepalive
+#    - URL: https://your-app-url.onrender.com/api/health
+#    - Schedule: Every 14 minutes
+#    - Save and enable
+
+# Note: Render free tier limitations
+# - Spins down after 15 minutes of inactivity
+# - Takes 30-60 seconds to spin back up
+# - 750 hours/month free (enough for 24/7 with keepalive)
