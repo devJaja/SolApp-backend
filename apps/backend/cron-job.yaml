@@ -6,7 +6,7 @@
 # 2. Click "New +" → "Cron Job"
 # 3. Connect your repository
 # 4. Use these settings:
-#    - Name: solcial-keepalive
+#    - Name: solapp-keepalive
 #    - Command: curl https://your-app-url.onrender.com/api/health
 #    - Schedule: */14 * * * * (every 14 minutes)
 # 5. Deploy
@@ -15,7 +15,7 @@
 # 1. Go to https://cron-job.org
 # 2. Create free account
 # 3. Create new cron job:
-#    - Title: Solcial Keepalive
+#    - Title: SolApp Keepalive
 #    - URL: https://your-app-url.onrender.com/api/health
 #    - Schedule: Every 14 minutes
 #    - Save and enable

@@ -6,7 +6,7 @@ The mini apps module has been added to the backend. To activate it:
 
 ### If running locally:
 ```bash
-cd solcial-backend
+cd solapp-backend
 pnpm install
 pnpm run start:dev
 ```

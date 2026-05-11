@@ -28,12 +28,12 @@ async function testEmail() {
     // Send test email
     console.log('2️⃣ Sending test email...');
     const info = await transporter.sendMail({
-      from: '"Solcial" <support@coreskool.xyz>',
+      from: '"SolApp" <support@coreskool.xyz>',
       to: 'support@coreskool.xyz', // Send to self for testing
-      subject: 'Test Email - Solcial',
+      subject: 'Test Email - SolApp',
       html: `
         <h1>Test Email</h1>
-        <p>This is a test email from Solcial backend.</p>
+        <p>This is a test email from SolApp backend.</p>
         <p>If you receive this, the email service is working correctly!</p>
       `,
     });

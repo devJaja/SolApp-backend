@@ -1,6 +1,6 @@
 # Backend Migration Scripts
 
-This directory contains database migration scripts for the Solcial backend.
+This directory contains database migration scripts for the SolApp backend.
 
 ## Available Scripts
 

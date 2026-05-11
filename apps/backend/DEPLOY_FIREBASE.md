@@ -78,7 +78,7 @@ After deployment, test by:
 
 For local development, you can use the file-based approach:
 
-1. Place `firebase-service-account.json` in `solcial-backend/` folder
+1. Place `firebase-service-account.json` in `solapp-backend/` folder
 2. The service will automatically detect and use it
 3. This file is in `.gitignore` so it won't be committed
 

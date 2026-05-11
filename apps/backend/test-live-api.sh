@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Test script for live API endpoints
-API_URL="https://solcial-backend.onrender.com/api"
+API_URL="https://solapp-backend.onrender.com/api"
 
-echo "🔍 Testing Solcial Backend API"
+echo "🔍 Testing SolApp Backend API"
 echo "================================"
 echo ""
 

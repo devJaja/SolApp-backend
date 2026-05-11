@@ -11,8 +11,8 @@ export class TwoFactorService {
    */
   generateSecret(email: string): { secret: string; otpauthUrl: string } {
     const secret = speakeasy.generateSecret({
-      name: `Solcial (${email})`,
-      issuer: 'Solcial',
+      name: `SolApp (${email})`,
+      issuer: 'SolApp',
       length: 32,
     });
 

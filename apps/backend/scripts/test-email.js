@@ -42,9 +42,9 @@ async function testEmail() {
   
   try {
     const info = await transporter.sendMail({
-      from: '"Solcial Test" <support@coreskool.xyz>',
+      from: '"SolApp Test" <support@coreskool.xyz>',
       to: testEmail,
-      subject: 'Test Email from Solcial - ' + new Date().toLocaleString(),
+      subject: 'Test Email from SolApp - ' + new Date().toLocaleString(),
       html: `
         <!DOCTYPE html>
         <html>
@@ -56,7 +56,7 @@ async function testEmail() {
             <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
               <h1 style="color: #9333ea; margin-bottom: 20px;">✅ Email Test Successful!</h1>
               <p style="color: #666; font-size: 16px; line-height: 1.6;">
-                This is a test email from your Solcial backend. If you're reading this, your email configuration is working correctly!
+                This is a test email from your SolApp backend. If you're reading this, your email configuration is working correctly!
               </p>
               <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
                 <p style="margin: 0; color: #666;"><strong>Sent at:</strong> ${new Date().toLocaleString()}</p>
@@ -73,7 +73,7 @@ async function testEmail() {
       text: `
         Email Test Successful!
         
-        This is a test email from your Solcial backend.
+        This is a test email from your SolApp backend.
         If you're reading this, your email configuration is working correctly!
         
         Sent at: ${new Date().toLocaleString()}

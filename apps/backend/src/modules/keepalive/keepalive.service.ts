@@ -10,7 +10,7 @@ export class KeepaliveService {
 
   constructor(private configService: ConfigService) {
     // Get the API URL from environment or construct it
-    this.apiUrl = this.configService.get<string>('API_URL') || 'https://solcial-backend.onrender.com';
+    this.apiUrl = this.configService.get<string>('API_URL') || 'https://solapp-backend.onrender.com';
     this.logger.log(`🔄 Keepalive service initialized - will ping ${this.apiUrl}/api/health`);
   }
 

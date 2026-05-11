@@ -506,7 +506,7 @@ export class ChatsService {
         sender.encryptedPrivateKey,
         recipient.walletAddress,
         sendTipDto.amount,
-        'Tip via Solcial',
+        'Tip via SolApp',
       );
 
       // Create payment message

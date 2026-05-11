@@ -26,7 +26,7 @@ export class WaitlistService {
     }
 
     // Create referral code
-    const referralCode = `SOLCIAL-${uuidv4().slice(0, 8).toUpperCase()}`;
+    const referralCode = `SOLAPP-${uuidv4().slice(0, 8).toUpperCase()}`;
 
     // Add to waitlist
     const waitlistEntry = new this.waitlistModel({

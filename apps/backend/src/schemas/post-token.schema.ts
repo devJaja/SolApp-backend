@@ -32,6 +32,5 @@ export class PostToken {
 
 export const PostTokenSchema = SchemaFactory.createForClass(PostToken);
 
-PostTokenSchema.index({ post: 1 });
 PostTokenSchema.index({ creator: 1 });
 PostTokenSchema.index({ tokenMintAddress: 1 });

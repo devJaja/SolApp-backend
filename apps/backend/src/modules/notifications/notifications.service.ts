@@ -29,7 +29,7 @@ export class NotificationsService {
     if (recipient?.expoPushToken && data.message) {
       await this.firebaseService.sendPushNotification(
         recipient.expoPushToken,
-        'Solcial',
+        'SolApp',
         data.message,
         {
           type: data.type,

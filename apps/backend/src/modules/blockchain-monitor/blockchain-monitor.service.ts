@@ -177,7 +177,7 @@ export class BlockchainMonitorService implements OnModuleInit {
       // Get sender address (usually the first account)
       const senderAddress = accountKeys[0]?.pubkey.toString();
 
-      // Check if sender is a Solcial user
+      // Check if sender is a SolApp user
       const senderUser = await this.userModel.findOne({ 
         walletAddress: senderAddress 
       }).select('_id username name').lean();
@@ -191,7 +191,7 @@ export class BlockchainMonitorService implements OnModuleInit {
       };
 
       if (senderUser) {
-        // Transaction from another Solcial user
+        // Transaction from another SolApp user
         message = `${senderUser.username || senderUser.name} sent you ${amountSOL.toFixed(4)} SOL`;
         notificationData.sender = senderUser._id;
         notificationData.message = message;

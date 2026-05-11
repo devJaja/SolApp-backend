@@ -28,7 +28,7 @@ import { WaitlistModule } from './modules/waitlist/waitlist.module';
       isGlobal: true,
     }),
     ScheduleModule.forRoot(),
-    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/solcial'),
+    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/solapp'),
     FirebaseModule,
     PusherModule,
     AuthModule,
