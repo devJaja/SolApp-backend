@@ -206,9 +206,10 @@ export async function readCiphertext(
   const ctId = Buffer.from(ciphertextAccountAddress, 'hex');
   const msg  = encodeReadCiphertextMessage(Chain.Solana, ctId, reencryptionKey, BigInt(epoch));
 
-  // Sign the read request with the user's keypair to prove authorisation
-  const { sign } = await import('@noble/ed25519');
-  const signature = await sign(msg, userKeypair.secretKey.slice(0, 32));
+  // Sign with nacl (available via @solana/web3.js's tweetnacl dep)
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const nacl = require('tweetnacl') as typeof import('tweetnacl');
+  const signature = nacl.sign.detached(msg, userKeypair.secretKey);
 
   const result = await client.readCiphertext({
     message: msg,
