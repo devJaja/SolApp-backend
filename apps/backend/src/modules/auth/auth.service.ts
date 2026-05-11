@@ -462,8 +462,8 @@ export class AuthService {
       };
     }
 
-    // Generate reset token
-    const resetToken = crypto.randomBytes(32).toString('hex');
+    // Generate 6-digit reset code
+    const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedToken = await bcrypt.hash(resetToken, 10);
     const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
