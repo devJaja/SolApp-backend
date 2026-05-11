@@ -109,7 +109,7 @@ export class WalletService {
 
       if (user.dWalletId) {
         // ── Non-custodial path: Ika dWallet signing ──────────────────────
-        const { approveTransfer, pollForSignature, getCpiAuthority } = await import('../../services/ika');
+        const { approveTransfer, pollForSignature, getCpiAuthority } = await import('../../services/ika.js');
         const { Keypair } = await import('@solana/web3.js');
         const { createHash } = await import('crypto');
 

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Chat, ChatDocument } from '../../schemas/chat.schema';
@@ -13,6 +13,8 @@ import { SendTipDto } from './dto/send-tip.dto';
 
 @Injectable()
 export class ChatsService {
+  private readonly logger = new Logger(ChatsService.name);
+
   constructor(
     @InjectModel(Chat.name) private chatModel: Model<ChatDocument>,
     @InjectModel(Message.name) private messageModel: Model<MessageDocument>,
@@ -606,11 +608,11 @@ export class ChatsService {
       const amountBuf = Buffer.alloc(8);
       amountBuf.writeBigUInt64LE(BigInt(Math.round(sendTipDto.amount * 1e9)));
       const { ciphertextIdentifiers } = await client.createInput({
-        chain: Chain.SOLANA,
+        chain: Chain.Solana,
         inputs: [{ ciphertextBytes: amountBuf, fheType: 4 }],
-        proof: new Uint8Array(64),
+        proof: Buffer.alloc(64),
         authorized: Buffer.from(process.env.SOLAPP_PRIVACY_PROGRAM_ID ?? '11111111111111111111111111111112'),
-        networkEncryptionPublicKey: new Uint8Array(32),
+        networkEncryptionPublicKey: Buffer.alloc(32),
       });
       ciphertextId = Buffer.from(ciphertextIdentifiers[0]).toString('hex');
     } catch (err) {

@@ -83,16 +83,16 @@ export async function encryptAmount(
   const client = createEncryptClient();
 
   const { ciphertextIdentifiers } = await client.createInput({
-    chain: Chain.SOLANA,
+    chain: Chain.Solana,
     inputs: [
       {
         ciphertextBytes: encodeLamports(lamports),
         fheType: FHE_TYPE_UINT64,
       },
     ],
-    proof,
-    authorized: SOLAPP_PRIVACY_PROGRAM_ID.toBytes(),
-    networkEncryptionPublicKey,
+    proof: Buffer.from(proof),
+    authorized: Buffer.from(SOLAPP_PRIVACY_PROGRAM_ID.toBytes()),
+    networkEncryptionPublicKey: Buffer.from(networkEncryptionPublicKey),
   });
 
   const id = ciphertextIdentifiers[0];
@@ -204,15 +204,16 @@ export async function readCiphertext(
   const client = createEncryptClient();
 
   const ctId = Buffer.from(ciphertextAccountAddress, 'hex');
-  const msg  = encodeReadCiphertextMessage(Chain.SOLANA, ctId, reencryptionKey, epoch);
+  const msg  = encodeReadCiphertextMessage(Chain.Solana, ctId, reencryptionKey, BigInt(epoch));
 
   // Sign the read request with the user's keypair to prove authorisation
-  const signature = userKeypair.sign(msg).signature;
+  const { sign } = await import('@noble/ed25519');
+  const signature = await sign(msg, userKeypair.secretKey.slice(0, 32));
 
   const result = await client.readCiphertext({
     message: msg,
-    signature,
-    signer: userKeypair.publicKey.toBytes(),
+    signature: Buffer.from(signature),
+    signer: Buffer.from(userKeypair.publicKey.toBytes()),
   });
 
   // In pre-alpha, result.value is the raw plaintext bytes
