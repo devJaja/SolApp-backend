@@ -13,11 +13,13 @@
  *   bun add @encrypt.xyz/pre-alpha-solana-client
  */
 
-import {
-  createEncryptClient,
-  encodeReadCiphertextMessage,
-  Chain,
-} from '@encrypt.xyz/pre-alpha-solana-client/grpc';
+// Encrypt client loaded via require to avoid moduleResolution conflicts
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const encryptGrpc = require('@encrypt.xyz/pre-alpha-solana-client/grpc') as any;
+const createEncryptClient = encryptGrpc.createEncryptClient;
+const encodeReadCiphertextMessage = encryptGrpc.encodeReadCiphertextMessage;
+const CHAIN_SOLANA = 1; // Chain.Solana
+
 import {
   Connection,
   PublicKey,
@@ -83,7 +85,7 @@ export async function encryptAmount(
   const client = createEncryptClient();
 
   const { ciphertextIdentifiers } = await client.createInput({
-    chain: Chain.Solana,
+    chain: CHAIN_SOLANA,
     inputs: [
       {
         ciphertextBytes: encodeLamports(lamports),
@@ -204,11 +206,11 @@ export async function readCiphertext(
   const client = createEncryptClient();
 
   const ctId = Buffer.from(ciphertextAccountAddress, 'hex');
-  const msg  = encodeReadCiphertextMessage(Chain.Solana, ctId, reencryptionKey, BigInt(epoch));
+  const msg  = encodeReadCiphertextMessage(CHAIN_SOLANA, ctId, reencryptionKey, BigInt(epoch));
 
-  // Sign with nacl (available via @solana/web3.js's tweetnacl dep)
+  // tweetnacl is a transitive dep of @solana/web3.js — always available
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const nacl = require('tweetnacl') as typeof import('tweetnacl');
+  const nacl = require('tweetnacl');
   const signature = nacl.sign.detached(msg, userKeypair.secretKey);
 
   const result = await client.readCiphertext({

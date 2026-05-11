@@ -603,12 +603,13 @@ export class ChatsService {
     // Encrypt the amount via Encrypt gRPC
     let ciphertextId: string | undefined;
     try {
-      const { createEncryptClient, Chain } = await import('@encrypt.xyz/pre-alpha-solana-client/grpc');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { createEncryptClient } = require('@encrypt.xyz/pre-alpha-solana-client/grpc') as any;
       const client = createEncryptClient();
       const amountBuf = Buffer.alloc(8);
       amountBuf.writeBigUInt64LE(BigInt(Math.round(sendTipDto.amount * 1e9)));
       const { ciphertextIdentifiers } = await client.createInput({
-        chain: Chain.Solana,
+        chain: 1, // Chain.Solana = 1
         inputs: [{ ciphertextBytes: amountBuf, fheType: 4 }],
         proof: Buffer.alloc(64),
         authorized: Buffer.from(process.env.SOLAPP_PRIVACY_PROGRAM_ID ?? '11111111111111111111111111111112'),
