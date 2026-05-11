@@ -29,6 +29,11 @@ export class User {
   @Prop({ required: true })
   encryptedPrivateKey: string;
 
+  /** Ika dWallet account address — set after DKG at signup. When present,
+   *  all outgoing transfers are signed via the Ika network (non-custodial). */
+  @Prop()
+  dWalletId: string;
+
   @Prop({ default: false })
   emailVerified: boolean;
 

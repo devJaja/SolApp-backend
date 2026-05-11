@@ -569,6 +569,89 @@ export class ChatsService {
     }
   }
 
+  async sendPrivateTip(chatId: string, userId: string, sendTipDto: SendTipDto) {
+    const chat = await this.chatModel.findById(chatId).populate('participants').lean();
+    if (!chat) throw new NotFoundException('Chat not found');
+
+    let participants = chat.participants as any[];
+    const arePopulated = participants.length > 0 &&
+      typeof participants[0] === 'object' && participants[0]._id && participants[0].username !== undefined;
+    if (!arePopulated) {
+      participants = (await Promise.all(
+        participants.map(async (p: any) => this.userModel.findById(p._id || p).lean())
+      )).filter(Boolean);
+    }
+
+    const isParticipant = participants.some((p: any) => p?._id?.toString() === userId);
+    if (!isParticipant) throw new BadRequestException('You are not a participant in this chat');
+
+    const sender = await this.userModel.findById(userId);
+    const recipient = participants.find((p: any) => p?._id?.toString() !== userId);
+    if (!sender || !recipient) throw new BadRequestException('Invalid participants');
+
+    // Transfer SOL on-chain (custodial path — dWallet path handled in wallet.service)
+    const signature = await this.solanaService.sendTransaction(
+      sender.walletAddress,
+      sender.encryptedPrivateKey,
+      recipient.walletAddress,
+      sendTipDto.amount,
+      'Private tip via SolApp',
+    );
+
+    // Encrypt the amount via Encrypt gRPC
+    let ciphertextId: string | undefined;
+    try {
+      const { createEncryptClient, Chain } = await import('@encrypt.xyz/pre-alpha-solana-client/grpc');
+      const client = createEncryptClient();
+      const amountBuf = Buffer.alloc(8);
+      amountBuf.writeBigUInt64LE(BigInt(Math.round(sendTipDto.amount * 1e9)));
+      const { ciphertextIdentifiers } = await client.createInput({
+        chain: Chain.SOLANA,
+        inputs: [{ ciphertextBytes: amountBuf, fheType: 4 }],
+        proof: new Uint8Array(64),
+        authorized: Buffer.from(process.env.SOLAPP_PRIVACY_PROGRAM_ID ?? '11111111111111111111111111111112'),
+        networkEncryptionPublicKey: new Uint8Array(32),
+      });
+      ciphertextId = Buffer.from(ciphertextIdentifiers[0]).toString('hex');
+    } catch (err) {
+      this.logger.warn(`Encrypt gRPC unavailable: ${err.message}`);
+    }
+
+    const message = await this.messageModel.create({
+      chat: chatId,
+      sender: userId,
+      content: 'Sent a private tip',
+      type: 'payment',
+      paymentAmount: sendTipDto.amount,
+      paymentSignature: signature,
+      isPrivateTip: true,
+      ciphertextId,
+    });
+
+    await this.chatModel.findByIdAndUpdate(chatId, {
+      lastMessage: 'Sent a private tip',
+      lastMessageAt: new Date(),
+      lastMessageBy: userId,
+    });
+
+    await message.populate('sender', 'username name avatar');
+    const messageData = { ...message.toObject(), id: message._id, isMine: true };
+
+    try {
+      await this.pusherService.trigger(`chat-${chatId}`, 'new-message', messageData);
+      const pids = participants.filter((p: any) => p?._id).map((p: any) => p._id.toString());
+      for (const pid of pids) {
+        await this.pusherService.trigger(`user-${pid}`, 'chat-updated', {
+          chatId, lastMessage: 'Sent a private tip', lastMessageAt: new Date(), lastMessageBy: userId,
+        });
+      }
+    } catch (err) {
+      this.logger.error(`Pusher error: ${err.message}`);
+    }
+
+    return messageData;
+  }
+
   async markAsRead(chatId: string, userId: string) {
     const chat = await this.chatModel.findById(chatId);
     if (!chat) {

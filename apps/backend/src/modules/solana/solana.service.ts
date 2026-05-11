@@ -26,6 +26,20 @@ export class SolanaService {
   }
 
   /**
+   * Returns the backend hot wallet keypair used for on-chain instructions
+   * (approve_transfer, etc.). Reads from BACKEND_KEYPAIR env var (base64)
+   * or falls back to generating a deterministic keypair from ENCRYPTION_KEY.
+   */
+  getBackendKeypair(): import('@solana/web3.js').Keypair {
+    const b64 = process.env.BACKEND_KEYPAIR;
+    if (b64) {
+      return Keypair.fromSecretKey(Buffer.from(b64, 'base64'));
+    }
+    // Deterministic fallback — derive from ENCRYPTION_KEY (32 bytes → seed)
+    return Keypair.fromSeed(this.ENCRYPTION_KEY.slice(0, 32));
+  }
+
+  /**
    * Generate new wallet keypair
    */
   generateWallet(): { publicKey: string; encryptedPrivateKey: string } {

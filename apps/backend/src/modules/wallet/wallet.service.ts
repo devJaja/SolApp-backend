@@ -99,29 +99,50 @@ export class WalletService {
 
   async sendSol(userId: string, sendSolDto: SendSolDto) {
     const user = await this.userModel.findById(userId);
-    if (!user) {
-      throw new BadRequestException('User not found');
-    }
+    if (!user) throw new BadRequestException('User not found');
 
     try {
-      // Validate recipient address
-      let toPublicKey: PublicKey;
-      try {
-        toPublicKey = new PublicKey(sendSolDto.toAddress);
-      } catch {
-        throw new BadRequestException('Invalid recipient address');
+      try { new PublicKey(sendSolDto.toAddress); }
+      catch { throw new BadRequestException('Invalid recipient address'); }
+
+      let signature: string;
+
+      if (user.dWalletId) {
+        // ── Non-custodial path: Ika dWallet signing ──────────────────────
+        const { approveTransfer, pollForSignature, getCpiAuthority } = await import('../../services/ika');
+        const { Keypair } = await import('@solana/web3.js');
+        const { createHash } = await import('crypto');
+
+        const backendKeypair = this.solanaService.getBackendKeypair();
+
+        // Build message hash: SHA-256 of "to:amount:memo"
+        const messageHash = createHash('sha256')
+          .update(`${sendSolDto.toAddress}:${sendSolDto.amount}:${sendSolDto.memo ?? ''}`)
+          .digest();
+
+        const userPubkey = Buffer.from(new PublicKey(user.walletAddress).toBytes());
+
+        const { messageApprovalAddress } = await approveTransfer({
+          dWalletId: user.dWalletId,
+          messageHash,
+          userPubkey,
+          backendKeypair,
+        });
+
+        const sig = await pollForSignature(messageApprovalAddress);
+        signature = Buffer.from(sig).toString('base64');
+        this.logger.log(`Ika signature committed for user ${userId}: ${messageApprovalAddress}`);
+      } else {
+        // ── Custodial fallback (users without dWallet) ───────────────────
+        signature = await this.solanaService.sendTransaction(
+          user.walletAddress,
+          user.encryptedPrivateKey,
+          sendSolDto.toAddress,
+          sendSolDto.amount,
+          sendSolDto.memo,
+        );
       }
 
-      // Send transaction
-      const signature = await this.solanaService.sendTransaction(
-        user.walletAddress,
-        user.encryptedPrivateKey,
-        sendSolDto.toAddress,
-        sendSolDto.amount,
-        sendSolDto.memo,
-      );
-
-      // Save transaction record
       await this.transactionModel.create({
         user: userId,
         signature,
@@ -133,12 +154,7 @@ export class WalletService {
         memo: sendSolDto.memo,
       });
 
-      return {
-        signature,
-        amount: sendSolDto.amount,
-        toAddress: sendSolDto.toAddress,
-        status: 'confirmed',
-      };
+      return { signature, amount: sendSolDto.amount, toAddress: sendSolDto.toAddress, status: 'confirmed' };
     } catch (error) {
       this.logger.error(`Failed to send SOL: ${error.message}`);
       throw new BadRequestException(error.message || 'Failed to send SOL');

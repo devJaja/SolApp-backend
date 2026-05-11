@@ -81,6 +81,12 @@ export class ChatsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post(':id/private-tip')
+  async sendPrivateTip(@Request() req, @Param('id') id: string, @Body() sendTipDto: SendTipDto) {
+    return this.chatsService.sendPrivateTip(id, req.user.userId, sendTipDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Put(':id/read')
   async markAsRead(@Request() req, @Param('id') id: string) {
     return this.chatsService.markAsRead(id, req.user.userId);

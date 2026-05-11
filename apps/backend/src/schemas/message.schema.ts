@@ -28,6 +28,12 @@ export class Message {
 
   @Prop({ default: false })
   isRead: boolean;
+
+  @Prop({ default: false })
+  isPrivateTip: boolean;
+
+  @Prop()
+  ciphertextId: string;
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message);
